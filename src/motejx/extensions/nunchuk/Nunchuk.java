@@ -11,7 +11,7 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package motejx.extensions.nunchuk;
 
@@ -30,16 +30,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
+ *
  * <p>
- * 
+ *
  * @author <a href="mailto:vfritzsch@users.sourceforge.net">Volker Fritzsch</a>
  */
 public class Nunchuk extends AbstractExtension implements DataListener {
 
-	private EventListenerList listenerList = new EventListenerList();
+	protected EventListenerList listenerList = new EventListenerList();
 
-	private Mote mote;
+	protected Mote mote;
 
 	private Logger log = LoggerFactory.getLogger(Nunchuk.class);
 
@@ -68,9 +68,10 @@ public class Nunchuk extends AbstractExtension implements DataListener {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see motej.event.DataListener#dataRead(motej.event.DataEvent)
 	 */
+	@Override
 	public void dataRead(DataEvent evt) {
 		if (calibrationData == null && evt.getError() == 0
 				&& evt.getAddress()[0] == 0x00
@@ -80,6 +81,7 @@ public class Nunchuk extends AbstractExtension implements DataListener {
 			log.debug("Calibration Data received.");
 
 			byte[] payload = evt.getPayload();
+			decrypt(payload);
 
 			calibrationData = new NunchukCalibrationData();
 			calibrationData.setZeroForceX(payload[0] & 0xff);
@@ -170,15 +172,16 @@ public class Nunchuk extends AbstractExtension implements DataListener {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see motej.Extension#initialize()
 	 */
+	@Override
 	public void initialize() {
 		mote.addDataListener(this);
-		
+
 		// initialize
 		mote.writeRegisters(new byte[] { (byte) 0xa4, 0x00, 0x40}, new byte[] { 0x00 });
-		
+
 		// request calibration data
 		mote.readRegisters(new byte[] { (byte) 0xa4, 0x00, 0x30 }, new byte[] {
 				0x00, 0x0f });
@@ -186,9 +189,10 @@ public class Nunchuk extends AbstractExtension implements DataListener {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see motej.Extension#parseExtensionData(byte[])
 	 */
+	@Override
 	public void parseExtensionData(byte[] extensionData) {
 		decrypt(extensionData);
 		fireAnalogStickEvent(extensionData);
@@ -220,16 +224,17 @@ public class Nunchuk extends AbstractExtension implements DataListener {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see motej.Extension#setMote(motej.Mote)
 	 */
+	@Override
 	public void setMote(Mote mote) {
 		this.mote = mote;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

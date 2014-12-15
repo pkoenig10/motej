@@ -33,6 +33,7 @@ import motej.event.StatusInformationListener;
 import motej.request.CalibrationDataRequest;
 import motej.request.MotionPlusActivateRequest;
 import motej.request.MotionPlusDeactivateRequest;
+import motej.request.MotionPlusNunchukActivateRequest;
 import motej.request.PlayerLedRequest;
 import motej.request.RawByteRequest;
 import motej.request.ReadRegisterRequest;
@@ -436,6 +437,14 @@ public class Mote {
     public void activateMotionPlus()
     {
         this.outgoing.sendRequest(new MotionPlusActivateRequest());
+    }
+
+    /**
+     * Methode to activate the already plugged-in MotionPlus in Nunchuk
+     * pass-through mode
+     */
+    public void activateMotionPlusNunchuk() {
+        this.outgoing.sendRequest(new MotionPlusNunchukActivateRequest());
     }
 
     /**
